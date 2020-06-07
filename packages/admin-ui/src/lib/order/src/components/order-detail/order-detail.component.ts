@@ -2,21 +2,23 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { marker as _ } from '@biesbjerg/ngx-translate-extract-marker';
-import { BaseDetailComponent } from '@vendure/admin-ui/core';
 import {
     AdjustmentType,
+    BaseDetailComponent,
     CustomFieldConfig,
+    DataService,
+    EditNoteDialogComponent,
     GetOrderHistory,
+    HistoryEntry,
+    ModalService,
+    NotificationService,
     Order,
     OrderDetail,
+    ServerConfigService,
     SortOrder,
 } from '@vendure/admin-ui/core';
-import { NotificationService } from '@vendure/admin-ui/core';
-import { DataService } from '@vendure/admin-ui/core';
-import { ServerConfigService } from '@vendure/admin-ui/core';
-import { ModalService } from '@vendure/admin-ui/core';
 import { omit } from '@vendure/common/lib/omit';
-import { Observable, of, Subject } from 'rxjs';
+import { EMPTY, Observable, of, Subject } from 'rxjs';
 import { startWith, switchMap, take } from 'rxjs/operators';
 
 import { CancelOrderDialogComponent } from '../cancel-order-dialog/cancel-order-dialog.component';
@@ -33,7 +35,7 @@ import { SettleRefundDialogComponent } from '../settle-refund-dialog/settle-refu
 export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragment>
     implements OnInit, OnDestroy {
     detailForm = new FormGroup({});
-    history$: Observable<GetOrderHistory.Items[] | null | undefined>;
+    history$: Observable<GetOrderHistory.Items[] | undefined>;
     fetchHistory = new Subject<void>();
     customFields: CustomFieldConfig[];
     orderLineCustomFields: CustomFieldConfig[];
@@ -72,7 +74,7 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                             createdAt: SortOrder.DESC,
                         },
                     })
-                    .mapStream((data) => data.order && data.order.history.items);
+                    .mapStream(data => data.order?.history.items);
             }),
         );
     }
@@ -86,7 +88,7 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
     }
 
     getLinePromotions(line: OrderDetail.Lines) {
-        return line.adjustments.filter((a) => a.type === AdjustmentType.PROMOTION);
+        return line.adjustments.filter(a => a.type === AdjustmentType.PROMOTION);
     }
 
     getPromotionLink(promotion: OrderDetail.Adjustments): any[] {
@@ -99,7 +101,7 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
         promotionAdjustment: OrderDetail.Adjustments,
     ): string | undefined {
         const id = promotionAdjustment.adjustmentSource.split(':')[1];
-        const promotion = order.promotions.find((p) => p.id === id);
+        const promotion = order.promotions.find(p => p.id === id);
         if (promotion) {
             return promotion.couponCode || undefined;
         }
@@ -110,8 +112,8 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
             return [];
         }
         return Object.values(shippingAddress)
-            .filter((val) => val !== 'OrderAddress')
-            .filter((line) => !!line);
+            .filter(val => val !== 'OrderAddress')
+            .filter(line => !!line);
     }
 
     settlePayment(payment: OrderDetail.Payments) {
@@ -123,6 +125,7 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                     this.notificationService.error(_('order.settle-payment-error'));
                 }
                 this.dataService.order.getOrder(this.id).single$.subscribe();
+                this.fetchHistory.next();
             }
         });
     }
@@ -131,7 +134,7 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
         this.entity$
             .pipe(
                 take(1),
-                switchMap((order) => {
+                switchMap(order => {
                     return this.modalService.fromComponent(FulfillOrderDialogComponent, {
                         size: 'xl',
                         locals: {
@@ -139,16 +142,16 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                         },
                     });
                 }),
-                switchMap((input) => {
+                switchMap(input => {
                     if (input) {
                         return this.dataService.order.createFullfillment(input);
                     } else {
                         return of(undefined);
                     }
                 }),
-                switchMap((result) => this.refetchOrder(result)),
+                switchMap(result => this.refetchOrder(result)),
             )
-            .subscribe((result) => {
+            .subscribe(result => {
                 if (result) {
                     this.notificationService.success(_('order.create-fulfillment-success'));
                 }
@@ -172,7 +175,7 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                 },
             })
             .pipe(
-                switchMap((transactionId) => {
+                switchMap(transactionId => {
                     if (transactionId) {
                         return this.dataService.order.settleRefund(
                             {
@@ -187,7 +190,7 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                 }),
                 // switchMap(result => this.refetchOrder(result)),
             )
-            .subscribe((result) => {
+            .subscribe(result => {
                 if (result) {
                     this.notificationService.success(_('order.settle-refund-success'));
                 }
@@ -202,9 +205,61 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                 note,
                 isPublic,
             })
-            .pipe(switchMap((result) => this.refetchOrder(result)))
-            .subscribe((result) => {
-                this.notificationService.success(_('order.add-note-success'));
+            .pipe(switchMap(result => this.refetchOrder(result)))
+            .subscribe(result => {
+                this.notificationService.success(_('common.notify-create-success'), {
+                    entity: 'Note',
+                });
+            });
+    }
+
+    updateNote(entry: HistoryEntry) {
+        this.modalService
+            .fromComponent(EditNoteDialogComponent, {
+                closable: true,
+                locals: {
+                    displayPrivacyControls: true,
+                    note: entry.data.note,
+                    noteIsPrivate: !entry.isPublic,
+                },
+            })
+            .pipe(
+                switchMap(result => {
+                    if (result) {
+                        return this.dataService.order.updateOrderNote({
+                            noteId: entry.id,
+                            isPublic: !result.isPrivate,
+                            note: result.note,
+                        });
+                    } else {
+                        return EMPTY;
+                    }
+                }),
+            )
+            .subscribe(result => {
+                this.fetchHistory.next();
+                this.notificationService.success(_('common.notify-update-success'), {
+                    entity: 'Note',
+                });
+            });
+    }
+
+    deleteNote(entry: HistoryEntry) {
+        return this.modalService
+            .dialog({
+                title: _('common.confirm-delete-note'),
+                body: entry.data.note,
+                buttons: [
+                    { type: 'secondary', label: _('common.cancel') },
+                    { type: 'danger', label: _('common.delete'), returnValue: true },
+                ],
+            })
+            .pipe(switchMap(res => (res ? this.dataService.order.deleteOrderNote(entry.id) : EMPTY)))
+            .subscribe(() => {
+                this.fetchHistory.next();
+                this.notificationService.success(_('common.notify-delete-success'), {
+                    entity: 'Note',
+                });
             });
     }
 
@@ -217,16 +272,16 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                 },
             })
             .pipe(
-                switchMap((input) => {
+                switchMap(input => {
                     if (input) {
                         return this.dataService.order.cancelOrder(input);
                     } else {
                         return of(undefined);
                     }
                 }),
-                switchMap((result) => this.refetchOrder(result)),
+                switchMap(result => this.refetchOrder(result)),
             )
-            .subscribe((result) => {
+            .subscribe(result => {
                 if (result) {
                     this.notificationService.success(_('order.cancelled-order-success'));
                 }
@@ -242,10 +297,10 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                 },
             })
             .pipe(
-                switchMap((input) => {
+                switchMap(input => {
                     if (input) {
                         return this.dataService.order.refundOrder(omit(input, ['cancel'])).pipe(
-                            switchMap((result) => {
+                            switchMap(result => {
                                 if (input.cancel.length) {
                                     return this.dataService.order.cancelOrder({
                                         orderId: this.id,
@@ -261,9 +316,9 @@ export class OrderDetailComponent extends BaseDetailComponent<OrderDetail.Fragme
                         return of(undefined);
                     }
                 }),
-                switchMap((result) => this.refetchOrder(result)),
+                switchMap(result => this.refetchOrder(result)),
             )
-            .subscribe((result) => {
+            .subscribe(result => {
                 if (result) {
                     this.notificationService.success(_('order.refund-order-success'));
                 }

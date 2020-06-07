@@ -1,4 +1,5 @@
 /* tslint:disable:no-non-null-assertion */
+import { omit } from '@vendure/common/lib/omit';
 import { pick } from '@vendure/common/lib/pick';
 import {
     atLeastNWithFacets,
@@ -11,7 +12,7 @@ import gql from 'graphql-tag';
 import path from 'path';
 
 import { initialData } from '../../../e2e-common/e2e-initial-data';
-import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
+import { testConfig, TEST_SETUP_TIMEOUT_MS } from '../../../e2e-common/test-config';
 
 import { testSuccessfulPaymentMethod } from './fixtures/test-payment-methods';
 import {
@@ -161,9 +162,8 @@ describe('Promotions applied to Orders', () => {
         it('order history records application', async () => {
             const { activeOrder } = await shopClient.query<GetActiveOrder.Query>(GET_ACTIVE_ORDER);
 
-            expect(activeOrder!.history.items).toEqual([
+            expect(activeOrder!.history.items.map(i => omit(i, ['id']))).toEqual([
                 {
-                    id: 'T_1',
                     type: HistoryEntryType.ORDER_COUPON_APPLIED,
                     data: {
                         couponCode: TEST_COUPON_CODE,
@@ -199,9 +199,8 @@ describe('Promotions applied to Orders', () => {
         it('order history records removal', async () => {
             const { activeOrder } = await shopClient.query<GetActiveOrder.Query>(GET_ACTIVE_ORDER);
 
-            expect(activeOrder!.history.items).toEqual([
+            expect(activeOrder!.history.items.map(i => omit(i, ['id']))).toEqual([
                 {
-                    id: 'T_1',
                     type: HistoryEntryType.ORDER_COUPON_APPLIED,
                     data: {
                         couponCode: TEST_COUPON_CODE,
@@ -209,7 +208,6 @@ describe('Promotions applied to Orders', () => {
                     },
                 },
                 {
-                    id: 'T_2',
                     type: HistoryEntryType.ORDER_COUPON_REMOVED,
                     data: {
                         couponCode: TEST_COUPON_CODE,
@@ -226,9 +224,8 @@ describe('Promotions applied to Orders', () => {
                 couponCode: 'NOT_THERE',
             });
 
-            expect(removeCouponCode!.history.items).toEqual([
+            expect(removeCouponCode!.history.items.map(i => omit(i, ['id']))).toEqual([
                 {
-                    id: 'T_1',
                     type: HistoryEntryType.ORDER_COUPON_APPLIED,
                     data: {
                         couponCode: TEST_COUPON_CODE,
@@ -236,7 +233,6 @@ describe('Promotions applied to Orders', () => {
                     },
                 },
                 {
-                    id: 'T_2',
                     type: HistoryEntryType.ORDER_COUPON_REMOVED,
                     data: {
                         couponCode: TEST_COUPON_CODE,
@@ -411,6 +407,7 @@ describe('Promotions applied to Orders', () => {
                 quantity: 2,
             });
             expect(addItemToOrder!.adjustments.length).toBe(0);
+            expect(addItemToOrder!.lines[2].adjustments.length).toBe(2); // 2x tax
             expect(addItemToOrder!.total).toBe(2640);
 
             const { applyCouponCode } = await shopClient.query<
@@ -421,6 +418,21 @@ describe('Promotions applied to Orders', () => {
             });
 
             expect(applyCouponCode!.total).toBe(1920);
+            expect(applyCouponCode!.lines[2].adjustments.length).toBe(4); // 2x tax, 2x promotion
+
+            const { removeCouponCode } = await shopClient.query<
+                RemoveCouponCode.Mutation,
+                RemoveCouponCode.Variables
+            >(REMOVE_COUPON_CODE, {
+                couponCode,
+            });
+
+            expect(removeCouponCode!.lines[2].adjustments.length).toBe(2); // 2x tax
+            expect(removeCouponCode!.total).toBe(2640);
+
+            const { activeOrder } = await shopClient.query<GetActiveOrder.Query>(GET_ACTIVE_ORDER);
+            expect(activeOrder!.lines[2].adjustments.length).toBe(2); // 2x tax
+            expect(activeOrder!.total).toBe(2640);
 
             await deletePromotion(promotion.id);
         });

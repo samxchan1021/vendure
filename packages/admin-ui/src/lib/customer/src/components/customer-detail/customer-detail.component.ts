@@ -2,23 +2,40 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { marker as _ } from '@biesbjerg/ngx-translate-extract-marker';
-import { BaseDetailComponent } from '@vendure/admin-ui/core';
 import {
+    BaseDetailComponent,
     CreateAddressInput,
     CreateCustomerInput,
     Customer,
     CustomFieldConfig,
+    DataService,
+    EditNoteDialogComponent,
     GetAvailableCountries,
     GetCustomer,
+    GetCustomerHistory,
     GetCustomerQuery,
+    HistoryEntry,
+    ModalService,
+    NotificationService,
+    ServerConfigService,
+    SortOrder,
     UpdateCustomerInput,
 } from '@vendure/admin-ui/core';
-import { NotificationService } from '@vendure/admin-ui/core';
-import { DataService } from '@vendure/admin-ui/core';
-import { ServerConfigService } from '@vendure/admin-ui/core';
 import { notNullOrUndefined } from '@vendure/common/lib/shared-utils';
-import { forkJoin, Observable, Subject } from 'rxjs';
-import { filter, map, merge, mergeMap, shareReplay, take } from 'rxjs/operators';
+import { EMPTY, forkJoin, from, Observable, Subject } from 'rxjs';
+import {
+    concatMap,
+    filter,
+    map,
+    merge,
+    mergeMap,
+    shareReplay,
+    startWith,
+    switchMap,
+    take,
+} from 'rxjs/operators';
+
+import { SelectCustomerGroupDialogComponent } from '../select-customer-group-dialog/select-customer-group-dialog.component';
 
 type CustomerWithOrders = NonNullable<GetCustomerQuery['customer']>;
 
@@ -35,6 +52,8 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
     availableCountries$: Observable<GetAvailableCountries.Items[]>;
     orders$: Observable<GetCustomer.Items[]>;
     ordersCount$: Observable<number>;
+    history$: Observable<GetCustomerHistory.Items[] | undefined>;
+    fetchHistory = new Subject<void>();
     defaultShippingAddressId: string;
     defaultBillingAddressId: string;
     addressDefaultsUpdated = false;
@@ -49,6 +68,7 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
         private changeDetector: ChangeDetectorRef,
         private formBuilder: FormBuilder,
         protected dataService: DataService,
+        private modalService: ModalService,
         private notificationService: NotificationService,
     ) {
         super(route, router, serverConfigService, dataService);
@@ -74,12 +94,24 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
         this.init();
         this.availableCountries$ = this.dataService.settings
             .getAvailableCountries()
-            .mapSingle((result) => result.countries.items)
+            .mapSingle(result => result.countries.items)
             .pipe(shareReplay(1));
 
         const customerWithUpdates$ = this.entity$.pipe(merge(this.orderListUpdates$));
-        this.orders$ = customerWithUpdates$.pipe(map((customer) => customer.orders.items));
-        this.ordersCount$ = this.entity$.pipe(map((customer) => customer.orders.totalItems));
+        this.orders$ = customerWithUpdates$.pipe(map(customer => customer.orders.items));
+        this.ordersCount$ = this.entity$.pipe(map(customer => customer.orders.totalItems));
+        this.history$ = this.fetchHistory.pipe(
+            startWith(null),
+            switchMap(() => {
+                return this.dataService.customer
+                    .getCustomerHistory(this.id, {
+                        sort: {
+                            createdAt: SortOrder.DESC,
+                        },
+                    })
+                    .mapStream(data => data.customer?.history.items);
+            }),
+        );
     }
 
     ngOnDestroy() {
@@ -148,7 +180,7 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
             phoneNumber: formValue.phoneNumber,
         };
         this.dataService.customer.createCustomer(customer, formValue.password).subscribe(
-            (data) => {
+            data => {
                 this.notificationService.success(_('common.notify-create-success'), {
                     entity: 'Customer',
                 });
@@ -165,7 +197,7 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
                 this.changeDetector.markForCheck();
                 this.router.navigate(['../', data.createCustomer.id], { relativeTo: this.route });
             },
-            (err) => {
+            err => {
                 this.notificationService.error(_('common.notify-create-error'), {
                     entity: 'Customer',
                 });
@@ -229,20 +261,127 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-update-success'), {
                         entity: 'Customer',
                     });
                     this.detailForm.markAsPristine();
                     this.addressDefaultsUpdated = false;
                     this.changeDetector.markForCheck();
+                    this.fetchHistory.next();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'Customer',
                     });
                 },
             );
+    }
+
+    addToGroup() {
+        this.modalService
+            .fromComponent(SelectCustomerGroupDialogComponent, {
+                size: 'md',
+            })
+            .pipe(
+                switchMap(groupIds => (groupIds ? from(groupIds) : EMPTY)),
+                concatMap(groupId => this.dataService.customer.addCustomersToGroup(groupId, [this.id])),
+            )
+            .subscribe({
+                next: res => {
+                    this.notificationService.success(_(`customer.add-customers-to-group-success`), {
+                        customerCount: 1,
+                        groupName: res.addCustomersToGroup.name,
+                    });
+                },
+                complete: () => {
+                    this.dataService.customer.getCustomer(this.id, { take: 0 }).single$.subscribe();
+                    this.fetchHistory.next();
+                },
+            });
+    }
+
+    removeFromGroup(group: GetCustomer.Groups) {
+        this.modalService
+            .dialog({
+                title: _('customer.confirm-remove-customer-from-group'),
+                buttons: [
+                    { type: 'secondary', label: _('common.cancel') },
+                    { type: 'danger', label: _('common.delete'), returnValue: true },
+                ],
+            })
+            .pipe(
+                switchMap(response =>
+                    response
+                        ? this.dataService.customer.removeCustomersFromGroup(group.id, [this.id])
+                        : EMPTY,
+                ),
+                switchMap(() => this.dataService.customer.getCustomer(this.id, { take: 0 }).single$),
+            )
+            .subscribe(result => {
+                this.notificationService.success(_(`customer.remove-customers-from-group-success`), {
+                    customerCount: 1,
+                    groupName: group.name,
+                });
+                this.fetchHistory.next();
+            });
+    }
+
+    addNoteToCustomer({ note }: { note: string }) {
+        this.dataService.customer.addNoteToCustomer(this.id, note).subscribe(() => {
+            this.fetchHistory.next();
+            this.notificationService.success(_('common.notify-create-success'), {
+                entity: 'Note',
+            });
+        });
+    }
+
+    updateNote(entry: HistoryEntry) {
+        this.modalService
+            .fromComponent(EditNoteDialogComponent, {
+                closable: true,
+                locals: {
+                    displayPrivacyControls: false,
+                    note: entry.data.note,
+                },
+            })
+            .pipe(
+                switchMap(result => {
+                    if (result) {
+                        return this.dataService.customer.updateCustomerNote({
+                            noteId: entry.id,
+                            note: result.note,
+                        });
+                    } else {
+                        return EMPTY;
+                    }
+                }),
+            )
+            .subscribe(result => {
+                this.fetchHistory.next();
+                this.notificationService.success(_('common.notify-update-success'), {
+                    entity: 'Note',
+                });
+            });
+    }
+
+    deleteNote(entry: HistoryEntry) {
+        return this.modalService
+            .dialog({
+                title: _('common.confirm-delete-note'),
+                body: entry.data.note,
+                buttons: [
+                    { type: 'secondary', label: _('common.cancel') },
+                    { type: 'danger', label: _('common.delete'), returnValue: true },
+                ],
+            })
+            .pipe(switchMap(res => (res ? this.dataService.customer.deleteCustomerNote(entry.id) : EMPTY)))
+            .subscribe(() => {
+                this.fetchHistory.next();
+                this.notificationService.success(_('common.notify-delete-success'), {
+                    entity: 'Note',
+                });
+            });
     }
 
     protected setFormValues(entity: Customer.Fragment): void {
@@ -285,6 +424,7 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
                 }
             }
         }
+        this.changeDetector.markForCheck();
     }
 
     /**
@@ -297,9 +437,9 @@ export class CustomerDetailComponent extends BaseDetailComponent<CustomerWithOrd
                 skip: (this.currentOrdersPage - 1) * this.ordersPerPage,
             })
             .single$.pipe(
-                map((data) => data.customer),
+                map(data => data.customer),
                 filter(notNullOrUndefined),
             )
-            .subscribe((result) => this.orderListUpdates$.next(result));
+            .subscribe(result => this.orderListUpdates$.next(result));
     }
 }
