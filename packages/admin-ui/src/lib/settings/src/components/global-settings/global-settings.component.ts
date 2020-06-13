@@ -72,7 +72,7 @@ export class GlobalSettingsComponent extends BaseDetailComponent<GlobalSettings>
                         entity: 'Settings',
                     });
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'Settings',
                     });

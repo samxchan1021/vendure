@@ -225,7 +225,7 @@ export class EmailEventHandler<T extends string = string, Event extends EventWit
         if (this.configurations.length === 0) {
             return;
         }
-        const exactMatch = this.configurations.find((c) => {
+        const exactMatch = this.configurations.find(c => {
             return (
                 (c.channelCode === channelCode || c.channelCode === 'default') &&
                 c.languageCode === languageCode
@@ -235,7 +235,7 @@ export class EmailEventHandler<T extends string = string, Event extends EventWit
             return exactMatch;
         }
         const channelMatch = this.configurations.find(
-            (c) => c.channelCode === channelCode && c.languageCode === 'default',
+            c => c.channelCode === channelCode && c.languageCode === 'default',
         );
         if (channelMatch) {
             return channelMatch;

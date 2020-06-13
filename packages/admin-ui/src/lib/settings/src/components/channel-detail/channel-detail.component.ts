@@ -54,7 +54,7 @@ export class ChannelDetailComponent extends BaseDetailComponent<Channel.Fragment
 
     ngOnInit() {
         this.init();
-        this.zones$ = this.dataService.settings.getZones().mapSingle((data) => data.zones);
+        this.zones$ = this.dataService.settings.getZones().mapSingle(data => data.zones);
         this.availableLanguageCodes$ = this.serverConfigService.getAvailableLanguages();
     }
 
@@ -97,7 +97,7 @@ export class ChannelDetailComponent extends BaseDetailComponent<Channel.Fragment
                 ),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-create-success'), {
                         entity: 'Channel',
                     });
@@ -105,7 +105,7 @@ export class ChannelDetailComponent extends BaseDetailComponent<Channel.Fragment
                     this.changeDetector.markForCheck();
                     this.router.navigate(['../', data.id], { relativeTo: this.route });
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-create-error'), {
                         entity: 'Channel',
                     });
@@ -121,7 +121,7 @@ export class ChannelDetailComponent extends BaseDetailComponent<Channel.Fragment
         this.entity$
             .pipe(
                 take(1),
-                mergeMap((channel) => {
+                mergeMap(channel => {
                     const input = {
                         id: channel.id,
                         code: formValue.code,
@@ -142,7 +142,7 @@ export class ChannelDetailComponent extends BaseDetailComponent<Channel.Fragment
                     this.detailForm.markAsPristine();
                     this.changeDetector.markForCheck();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'Channel',
                     });
@@ -172,7 +172,10 @@ export class ChannelDetailComponent extends BaseDetailComponent<Channel.Fragment
     }
 
     private generateToken(): string {
-        const randomString = () => Math.random().toString(36).substr(3, 10);
+        const randomString = () =>
+            Math.random()
+                .toString(36)
+                .substr(3, 10);
         return `${randomString()}${randomString()}`;
     }
 }

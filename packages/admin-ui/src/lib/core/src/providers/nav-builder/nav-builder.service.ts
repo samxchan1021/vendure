@@ -208,7 +208,7 @@ export class NavBuilderService {
                     if (!config.requiresPermission) {
                         config.requiresPermission = Permission.Authenticated;
                     }
-                    const index = initialConfig.findIndex(c => c.id === before);
+                    const index = initialConfig.findIndex((c) => c.id === before);
                     if (-1 < index) {
                         initialConfig.splice(index, 0, config);
                     } else {
@@ -223,14 +223,14 @@ export class NavBuilderService {
         this.navMenuConfig$ = combineLatest(combinedConfig$, itemAdditions$).pipe(
             map(([sections, additionalItems]) => {
                 for (const item of additionalItems) {
-                    const section = sections.find(s => s.id === item.sectionId);
+                    const section = sections.find((s) => s.id === item.sectionId);
                     if (!section) {
                         // tslint:disable-next-line:no-console
                         console.error(
                             `Could not add menu item "${item.config.id}", section "${item.sectionId}" does not exist`,
                         );
                     } else {
-                        const index = section.items.findIndex(i => i.id === item.before);
+                        const index = section.items.findIndex((i) => i.id === item.before);
                         if (-1 < index) {
                             section.items.splice(index, 0, item.config);
                         } else {
@@ -242,15 +242,15 @@ export class NavBuilderService {
                 // Aggregate any badges defined for the nav items in each section
                 for (const section of sections) {
                     const itemBadgeStatuses = section.items
-                        .map(i => i.statusBadge)
+                        .map((i) => i.statusBadge)
                         .filter(notNullOrUndefined);
                     this.sectionBadges[section.id] = combineLatest(itemBadgeStatuses).pipe(
-                        map(badges => {
-                            const propagatingBadges = badges.filter(b => b.propagateToSection);
+                        map((badges) => {
+                            const propagatingBadges = badges.filter((b) => b.propagateToSection);
                             if (propagatingBadges.length === 0) {
                                 return 'none';
                             }
-                            const statuses = propagatingBadges.map(b => b.type);
+                            const statuses = propagatingBadges.map((b) => b.type);
                             if (statuses.includes('error')) {
                                 return 'error';
                             } else if (statuses.includes('warning')) {

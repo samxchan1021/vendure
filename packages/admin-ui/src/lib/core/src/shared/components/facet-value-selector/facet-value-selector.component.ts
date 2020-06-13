@@ -56,9 +56,9 @@ export class FacetValueSelectorComponent implements OnInit, ControlValueAccessor
         if (this.readonly) {
             return;
         }
-        this.selectedValuesChange.emit(selected.map((s) => s.value));
+        this.selectedValuesChange.emit(selected.map(s => s.value));
         if (this.onChangeFn) {
-            this.onChangeFn(JSON.stringify(selected.map((s) => s.id)));
+            this.onChangeFn(JSON.stringify(selected.map(s => s.id)));
         }
     }
 
@@ -88,7 +88,7 @@ export class FacetValueSelectorComponent implements OnInit, ControlValueAccessor
                 throw err;
             }
         } else if (obj) {
-            this.value = obj.map((fv) => fv.id);
+            this.value = obj.map(fv => fv.id);
         }
     }
 

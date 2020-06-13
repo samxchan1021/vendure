@@ -44,7 +44,7 @@ export function customerBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.customers',
-        getName: (customer) => `${customer.firstName} ${customer.lastName}`,
+        getName: customer => `${customer.firstName} ${customer.lastName}`,
         route: 'customers',
     });
 }

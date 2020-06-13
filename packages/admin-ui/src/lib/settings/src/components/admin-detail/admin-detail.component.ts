@@ -66,7 +66,7 @@ export class AdminDetailComponent extends BaseDetailComponent<GetAdministrator.A
     ngOnInit() {
         this.init();
         this.administrator$ = this.entity$;
-        this.allRoles$ = this.dataService.administrator.getRoles(99999).mapStream((item) => item.roles.items);
+        this.allRoles$ = this.dataService.administrator.getRoles(99999).mapStream(item => item.roles.items);
         this.dataService.client.userStatus().single$.subscribe(({ userStatus }) => {
             if (!userStatus.permissions.includes(Permission.UpdateAdministrator)) {
                 const rolesSelect = this.detailForm.get('roles');
@@ -107,10 +107,10 @@ export class AdminDetailComponent extends BaseDetailComponent<GetAdministrator.A
             firstName: formValue.firstName,
             lastName: formValue.lastName,
             password: formValue.password,
-            roleIds: formValue.roles.map((role) => role.id),
+            roleIds: formValue.roles.map(role => role.id),
         };
         this.dataService.administrator.createAdministrator(administrator).subscribe(
-            (data) => {
+            data => {
                 this.notificationService.success(_('common.notify-create-success'), {
                     entity: 'Administrator',
                 });
@@ -118,7 +118,7 @@ export class AdminDetailComponent extends BaseDetailComponent<GetAdministrator.A
                 this.changeDetector.markForCheck();
                 this.router.navigate(['../', data.createAdministrator.id], { relativeTo: this.route });
             },
-            (err) => {
+            err => {
                 this.notificationService.error(_('common.notify-create-error'), {
                     entity: 'Administrator',
                 });
@@ -138,20 +138,20 @@ export class AdminDetailComponent extends BaseDetailComponent<GetAdministrator.A
                         firstName: formValue.firstName,
                         lastName: formValue.lastName,
                         password: formValue.password,
-                        roleIds: formValue.roles.map((role) => role.id),
+                        roleIds: formValue.roles.map(role => role.id),
                     };
                     return this.dataService.administrator.updateAdministrator(administrator);
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-update-success'), {
                         entity: 'Administrator',
                     });
                     this.detailForm.markAsPristine();
                     this.changeDetector.markForCheck();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'Administrator',
                     });
@@ -189,7 +189,7 @@ export class AdminDetailComponent extends BaseDetailComponent<GetAdministrator.A
                     const channelPermissions = channelIdPermissionsMap.get(channel.id);
                     const permissionSet = channelPermissions || new Set<Permission>();
 
-                    role.permissions.forEach((p) => permissionSet.add(p));
+                    role.permissions.forEach(p => permissionSet.add(p));
                     channelIdPermissionsMap.set(channel.id, permissionSet);
                     channelIdCodeMap.set(channel.id, channel.code);
                 }

@@ -66,7 +66,7 @@ export class TaxCategoryDetailComponent extends BaseDetailComponent<TaxCategory.
         const formValue = this.detailForm.value;
         const input = { name: formValue.name } as CreateTaxCategoryInput;
         this.dataService.settings.createTaxCategory(input).subscribe(
-            (data) => {
+            data => {
                 this.notificationService.success(_('common.notify-create-success'), {
                     entity: 'TaxCategory',
                 });
@@ -74,7 +74,7 @@ export class TaxCategoryDetailComponent extends BaseDetailComponent<TaxCategory.
                 this.changeDetector.markForCheck();
                 this.router.navigate(['../', data.createTaxCategory.id], { relativeTo: this.route });
             },
-            (err) => {
+            err => {
                 this.notificationService.error(_('common.notify-create-error'), {
                     entity: 'TaxCategory',
                 });
@@ -90,7 +90,7 @@ export class TaxCategoryDetailComponent extends BaseDetailComponent<TaxCategory.
         this.taxCategory$
             .pipe(
                 take(1),
-                mergeMap((taxCategory) => {
+                mergeMap(taxCategory => {
                     const input = {
                         id: taxCategory.id,
                         name: formValue.name,
@@ -99,14 +99,14 @@ export class TaxCategoryDetailComponent extends BaseDetailComponent<TaxCategory.
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-update-success'), {
                         entity: 'TaxCategory',
                     });
                     this.detailForm.markAsPristine();
                     this.changeDetector.markForCheck();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'TaxCategory',
                     });

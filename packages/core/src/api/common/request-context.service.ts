@@ -86,7 +86,7 @@ export class RequestContextService {
             return false;
         }
         const permissionsOnChannel = user.roles
-            .filter(role => role.channels.find(c => idsAreEqual(c.id, channel.id)))
+            .filter((role) => role.channels.find((c) => idsAreEqual(c.id, channel.id)))
             .reduce((output, role) => [...output, ...role.permissions], [] as Permission[]);
         return this.arraysIntersect(permissions, permissionsOnChannel);
     }

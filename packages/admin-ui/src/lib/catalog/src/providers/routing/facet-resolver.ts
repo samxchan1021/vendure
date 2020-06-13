@@ -24,7 +24,7 @@ export class FacetResolver extends BaseEntityResolver<FacetWithValues.Fragment> 
                 translations: [],
                 values: [],
             },
-            (id) => dataService.facet.getFacet(id).mapStream((data) => data.facet),
+            id => dataService.facet.getFacet(id).mapStream(data => data.facet),
         );
     }
 }

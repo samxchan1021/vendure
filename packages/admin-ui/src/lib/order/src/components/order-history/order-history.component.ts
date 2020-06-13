@@ -88,13 +88,13 @@ export class OrderHistoryComponent {
 
     getFullfillment(entry: GetOrderHistory.Items): OrderDetail.Fulfillments | undefined {
         if (entry.type === HistoryEntryType.ORDER_FULLFILLMENT && this.order.fulfillments) {
-            return this.order.fulfillments.find((f) => f.id === entry.data.fulfillmentId);
+            return this.order.fulfillments.find(f => f.id === entry.data.fulfillmentId);
         }
     }
 
     getPayment(entry: GetOrderHistory.Items): OrderDetail.Payments | undefined {
         if (entry.type === HistoryEntryType.ORDER_PAYMENT_TRANSITION && this.order.payments) {
-            return this.order.payments.find((p) => p.id === entry.data.paymentId);
+            return this.order.payments.find(p => p.id === entry.data.paymentId);
         }
     }
 

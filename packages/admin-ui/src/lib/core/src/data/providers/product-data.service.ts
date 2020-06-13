@@ -274,7 +274,7 @@ export class ProductDataService {
 
     createAssets(files: File[]) {
         return this.baseDataService.mutate<CreateAssets.Mutation, CreateAssets.Variables>(CREATE_ASSETS, {
-            input: files.map((file) => ({ file })),
+            input: files.map(file => ({ file })),
         });
     }
 

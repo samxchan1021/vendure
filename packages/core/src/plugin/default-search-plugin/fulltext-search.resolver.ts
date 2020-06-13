@@ -37,7 +37,7 @@ export class ShopFulltextSearchResolver implements Omit<BaseSearchResolver, 'rei
         @Parent() parent: { input: SearchInput },
     ): Promise<Array<{ facetValue: FacetValue; count: number }>> {
         const facetValues = await this.fulltextSearchService.facetValues(ctx, parent.input, true);
-        return facetValues.filter((i) => !i.facetValue.facet.isPrivate);
+        return facetValues.filter(i => !i.facetValue.facet.isPrivate);
     }
 }
 

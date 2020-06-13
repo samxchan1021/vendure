@@ -187,7 +187,7 @@ export function administratorBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.administrators',
-        getName: admin => `${admin.firstName} ${admin.lastName}`,
+        getName: (admin) => `${admin.firstName} ${admin.lastName}`,
         route: 'administrators',
     });
 }
@@ -197,7 +197,7 @@ export function channelBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.channels',
-        getName: channel => channel.code,
+        getName: (channel) => channel.code,
         route: 'channels',
     });
 }
@@ -207,7 +207,7 @@ export function roleBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.roles',
-        getName: role => role.description,
+        getName: (role) => role.description,
         route: 'roles',
     });
 }
@@ -217,7 +217,7 @@ export function taxCategoryBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.tax-categories',
-        getName: category => category.name,
+        getName: (category) => category.name,
         route: 'tax-categories',
     });
 }
@@ -227,7 +227,7 @@ export function taxRateBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.tax-rates',
-        getName: category => category.name,
+        getName: (category) => category.name,
         route: 'tax-rates',
     });
 }
@@ -237,7 +237,7 @@ export function countryBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.countries',
-        getName: promotion => promotion.name,
+        getName: (promotion) => promotion.name,
         route: 'countries',
     });
 }
@@ -247,7 +247,7 @@ export function shippingMethodBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.shipping-methods',
-        getName: method => method.description,
+        getName: (method) => method.description,
         route: 'shipping-methods',
     });
 }
@@ -257,7 +257,7 @@ export function paymentMethodBreadcrumb(data: any, params: any) {
         entity: data.entity,
         id: params.id,
         breadcrumbKey: 'breadcrumb.payment-methods',
-        getName: method => method.code,
+        getName: (method) => method.code,
         route: 'payment-methods',
     });
 }

@@ -25,7 +25,7 @@ import { ValidateCustomFieldsInterceptor } from './middleware/validate-custom-fi
         ApiSharedModule,
         AdminApiModule,
         ShopApiModule,
-        configureGraphQLModule(configService => ({
+        configureGraphQLModule((configService) => ({
             apiType: 'shop',
             apiPath: configService.apiOptions.shopApiPath,
             playground: configService.apiOptions.shopApiPlayground,
@@ -35,7 +35,7 @@ import { ValidateCustomFieldsInterceptor } from './middleware/validate-custom-fi
             ),
             resolverModule: ShopApiModule,
         })),
-        configureGraphQLModule(configService => ({
+        configureGraphQLModule((configService) => ({
             apiType: 'admin',
             apiPath: configService.apiOptions.adminApiPath,
             playground: configService.apiOptions.adminApiPlayground,

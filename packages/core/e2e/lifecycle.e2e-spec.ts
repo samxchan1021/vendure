@@ -9,7 +9,7 @@ import { createTestEnvironment } from '@vendure/testing';
 import path from 'path';
 
 import { initialData } from '../../../e2e-common/e2e-initial-data';
-import { testConfig, TEST_SETUP_TIMEOUT_MS } from '../../../e2e-common/test-config';
+import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 
 const strategyInitSpy = jest.fn();
 const strategyDestroySpy = jest.fn();
@@ -20,12 +20,12 @@ class TestIdStrategy extends AutoIncrementIdStrategy {
     async init(injector: Injector) {
         const productService = injector.get(ProductService);
         const connection = injector.getConnection();
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         strategyInitSpy(productService.constructor.name, connection.name);
     }
 
     async destroy() {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         strategyDestroySpy();
     }
 }
@@ -34,17 +34,17 @@ const testShippingEligChecker = new ShippingEligibilityChecker({
     code: 'test',
     args: {},
     description: [],
-    init: async injector => {
+    init: async (injector) => {
         const productService = injector.get(ProductService);
         const connection = injector.getConnection();
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         codInitSpy(productService.constructor.name, connection.name);
     },
     destroy: async () => {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
         codDestroySpy();
     },
-    check: order => {
+    check: (order) => {
         return true;
     },
 });

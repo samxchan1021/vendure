@@ -3,7 +3,7 @@ import { createTestEnvironment } from '@vendure/testing';
 import path from 'path';
 
 import { initialData } from '../../../e2e-common/e2e-initial-data';
-import { testConfig, TEST_SETUP_TIMEOUT_MS } from '../../../e2e-common/test-config';
+import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 
 import { PluginWithJobQueue } from './fixtures/test-plugins/with-job-queue';
 import { GetRunningJobs, JobState } from './graphql/generated-e2e-admin-types';
@@ -51,7 +51,7 @@ describe('JobQueue', () => {
                     },
                 },
             })
-            .then(data => data.jobs);
+            .then((data) => data.jobs);
     }
 
     let testJobId: string;
@@ -101,5 +101,5 @@ describe('JobQueue', () => {
 });
 
 function sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }

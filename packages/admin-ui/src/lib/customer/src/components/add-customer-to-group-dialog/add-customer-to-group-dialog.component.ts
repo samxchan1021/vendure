@@ -32,12 +32,12 @@ export class AddCustomerToGroupDialogComponent implements Dialog<string[]>, OnIn
             switchMap(({ skip, take, filterTerm }) => {
                 return this.dataService.customer
                     .getCustomerList(take, skip, filterTerm)
-                    .mapStream((res) => res.customers);
+                    .mapStream(res => res.customers);
             }),
         );
 
-        this.customers$ = customerResult$.pipe(map((res) => res.items));
-        this.customersTotal$ = customerResult$.pipe(map((res) => res.totalItems));
+        this.customers$ = customerResult$.pipe(map(res => res.items));
+        this.customersTotal$ = customerResult$.pipe(map(res => res.totalItems));
     }
 
     cancel() {

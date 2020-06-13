@@ -39,7 +39,7 @@ export class ElasticsearchIndexService {
         updateIndexQueue = this.jobService.createQueue({
             name: 'update-search-index',
             concurrency: 1,
-            process: (job) => {
+            process: job => {
                 const data = job.data;
                 switch (data.type) {
                     case 'reindex':
@@ -89,7 +89,7 @@ export class ElasticsearchIndexService {
     }
 
     updateVariants(ctx: RequestContext, variants: ProductVariant[]) {
-        const variantIds = variants.map((v) => v.id);
+        const variantIds = variants.map(v => v.id);
         this.addJobToQueue({ type: 'update-variants', ctx: ctx.serialize(), variantIds });
     }
 
@@ -98,7 +98,7 @@ export class ElasticsearchIndexService {
     }
 
     deleteVariant(ctx: RequestContext, variants: ProductVariant[]) {
-        const variantIds = variants.map((v) => v.id);
+        const variantIds = variants.map(v => v.id);
         this.addJobToQueue({ type: 'delete-variant', ctx: ctx.serialize(), variantIds });
     }
 
@@ -141,7 +141,7 @@ export class ElasticsearchIndexService {
     private sendMessage(job: Job<any>, message: WorkerMessage<any, any>) {
         this.workerService.send(message).subscribe({
             complete: () => job.complete(true),
-            error: (err) => {
+            error: err => {
                 Logger.error(err);
                 job.fail(err);
             },

@@ -30,7 +30,7 @@ export class ProductOptionService {
             .find(ProductOption, {
                 relations: ['group'],
             })
-            .then((options) => options.map((option) => translateDeep(option, ctx.languageCode)));
+            .then(options => options.map(option => translateDeep(option, ctx.languageCode)));
     }
 
     findOne(ctx: RequestContext, id: ID): Promise<Translated<ProductOption> | undefined> {
@@ -38,7 +38,7 @@ export class ProductOptionService {
             .findOne(ProductOption, id, {
                 relations: ['group'],
             })
-            .then((option) => option && translateDeep(option, ctx.languageCode));
+            .then(option => option && translateDeep(option, ctx.languageCode));
     }
 
     async create(
@@ -54,7 +54,7 @@ export class ProductOptionService {
             input,
             entityType: ProductOption,
             translationType: ProductOptionTranslation,
-            beforeSave: (po) => (po.group = productOptionGroup),
+            beforeSave: po => (po.group = productOptionGroup),
         });
         return assertFound(this.findOne(ctx, option.id));
     }

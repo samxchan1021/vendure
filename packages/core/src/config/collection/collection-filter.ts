@@ -31,7 +31,8 @@ export interface CollectionFilterConfig<T extends CollectionFilterArgs>
  * [`QueryBuilder`](https://typeorm.io/#/select-query-builder) object to which clauses may be added.
  *
  * Creating a CollectionFilter is considered an advanced Vendure topic. For more insight into how
- * they work, study the [default collection filters](https://github.com/vendure-ecommerce/vendure/blob/master/packages/core/src/config/collection/default-collection-filters.ts)
+ * they work, study the default collection filters
+ * [source](https://github.com/vendure-ecommerce/vendure/blob/master/packages/core/src/config/collection/default-collection-filters.ts)
  *
  * @docsCategory configuration
  */

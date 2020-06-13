@@ -94,7 +94,7 @@ ${extensions
         e.ngModules
             .filter(m => m.type === 'shared')
             .map(m => `import { ${m.ngModuleName} } from '${getModuleFilePath(e.id, m)}';\n`)
-			.join(''),
+            .join(''),
     )
     .join('')}
 

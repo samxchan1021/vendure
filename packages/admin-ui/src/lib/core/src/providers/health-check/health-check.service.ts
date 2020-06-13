@@ -44,15 +44,15 @@ export class HealthCheckService {
             shareReplay(1),
         );
 
-        this.status$ = result$.pipe(map(res => res.status));
+        this.status$ = result$.pipe(map((res) => res.status));
         this.details$ = result$.pipe(
-            map(res =>
-                Object.keys(res.details).map(key => {
+            map((res) =>
+                Object.keys(res.details).map((key) => {
                     return { key, result: res.details[key] };
                 }),
             ),
         );
-        this.lastCheck$ = result$.pipe(map(res => res.lastChecked));
+        this.lastCheck$ = result$.pipe(map((res) => res.lastChecked));
     }
 
     refresh() {
@@ -61,8 +61,8 @@ export class HealthCheckService {
 
     private checkHealth() {
         return this.httpClient.get<HealthCheckResult>(this.healthCheckEndpoint).pipe(
-            catchError(err => of(err.error)),
-            map(res => ({ ...res, lastChecked: new Date() })),
+            catchError((err) => of(err.error)),
+            map((res) => ({ ...res, lastChecked: new Date() })),
         );
     }
 }

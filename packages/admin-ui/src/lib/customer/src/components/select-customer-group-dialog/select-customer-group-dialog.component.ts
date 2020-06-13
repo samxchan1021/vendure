@@ -20,7 +20,7 @@ export class SelectCustomerGroupDialogComponent implements Dialog<string[]>, OnI
     ngOnInit() {
         this.groups$ = this.dataService.customer
             .getCustomerGroupList()
-            .mapStream((res) => res.customerGroups.items);
+            .mapStream(res => res.customerGroups.items);
     }
 
     cancel() {

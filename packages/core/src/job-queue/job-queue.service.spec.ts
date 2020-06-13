@@ -33,11 +33,11 @@ describe('JobQueueService', () => {
         await module.close();
     });
 
-    it('data is passed into job', (cb) => {
+    it('data is passed into job', cb => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
+            process: job => {
                 job.complete();
                 expect(job.data).toBe('hello');
                 cb();
@@ -52,7 +52,7 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
+            process: job => {
                 subject.subscribe(() => {
                     job.complete('yay');
                 });
@@ -77,7 +77,7 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
+            process: job => {
                 subject.subscribe(() => {
                     job.fail('uh oh');
                 });
@@ -103,7 +103,7 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
+            process: job => {
                 throw err;
             },
         });
@@ -124,7 +124,7 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: async (job) => {
+            process: async job => {
                 throw err;
             },
         });
@@ -144,7 +144,7 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
+            process: job => {
                 subject.subscribe(() => {
                     job.complete();
                 });
@@ -184,7 +184,7 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 2,
-            process: (job) => {
+            process: job => {
                 subject.subscribe(() => {
                     job.complete();
                 });
@@ -233,7 +233,7 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
+            process: job => {
                 job.complete();
             },
         });
@@ -252,8 +252,8 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
-                subject.subscribe((success) => (success ? job.complete() : job.fail()));
+            process: job => {
+                subject.subscribe(success => (success ? job.complete() : job.fail()));
             },
         });
 
@@ -283,8 +283,8 @@ describe('JobQueueService', () => {
         const testQueue = jobQueueService.createQueue<string>({
             name: 'test',
             concurrency: 1,
-            process: (job) => {
-                subject.subscribe((success) => (success ? job.complete() : job.fail()));
+            process: job => {
+                subject.subscribe(success => (success ? job.complete() : job.fail()));
             },
         });
 
@@ -301,7 +301,7 @@ describe('JobQueueService', () => {
 });
 
 function tick(ms: number): Promise<void> {
-    return new Promise<void>((resolve) => setTimeout(resolve, ms));
+    return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
 class MockConfigService {

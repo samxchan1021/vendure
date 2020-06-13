@@ -77,14 +77,14 @@ export class PaymentMethodDetailComponent extends BaseDetailComponent<PaymentMet
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-update-success'), {
                         entity: 'PaymentMethod',
                     });
                     this.detailForm.markAsPristine();
                     this.changeDetector.markForCheck();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'PaymentMethod',
                     });

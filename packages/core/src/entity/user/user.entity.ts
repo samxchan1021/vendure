@@ -54,13 +54,13 @@ export class User extends VendureEntity implements HasCustomFields, SoftDeletabl
     @Column({ type: 'varchar', nullable: true })
     pendingIdentifier: string | null;
 
-    @ManyToMany(type => Role)
+    @ManyToMany((type) => Role)
     @JoinTable()
     roles: Role[];
 
     @Column({ nullable: true })
     lastLogin: string;
 
-    @Column(type => CustomUserFields)
+    @Column((type) => CustomUserFields)
     customFields: CustomUserFields;
 }

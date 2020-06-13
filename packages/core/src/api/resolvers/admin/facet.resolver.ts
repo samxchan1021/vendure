@@ -92,7 +92,7 @@ export class FacetResolver {
         if (!facet) {
             throw new EntityNotFoundError('Facet', facetId);
         }
-        return Promise.all(input.map((facetValue) => this.facetValueService.create(facet, facetValue)));
+        return Promise.all(input.map(facetValue => this.facetValueService.create(facet, facetValue)));
     }
 
     @Mutation()
@@ -101,7 +101,7 @@ export class FacetResolver {
         @Args() args: MutationUpdateFacetValuesArgs,
     ): Promise<Array<Translated<FacetValue>>> {
         const { input } = args;
-        return Promise.all(input.map((facetValue) => this.facetValueService.update(facetValue)));
+        return Promise.all(input.map(facetValue => this.facetValueService.update(facetValue)));
     }
 
     @Mutation()
@@ -110,6 +110,6 @@ export class FacetResolver {
         @Ctx() ctx: RequestContext,
         @Args() args: MutationDeleteFacetValuesArgs,
     ): Promise<DeletionResponse[]> {
-        return Promise.all(args.ids.map((id) => this.facetValueService.delete(ctx, id, args.force || false)));
+        return Promise.all(args.ids.map(id => this.facetValueService.delete(ctx, id, args.force || false)));
     }
 }

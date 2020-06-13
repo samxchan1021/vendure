@@ -9,7 +9,7 @@ import {
 
 @VendurePlugin({
     imports: [ConfigModule],
-    configuration: (config) => {
+    configuration: config => {
         // tslint:disable-next-line:no-non-null-assertion
         config.defaultLanguageCode = LanguageCode.zh;
         return config;

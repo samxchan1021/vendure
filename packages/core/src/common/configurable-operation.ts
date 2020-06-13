@@ -221,9 +221,9 @@ function localizeConfig(
 }
 
 function localizeString(stringArray: LocalizedStringArray, languageCode: LanguageCode): string {
-    let match = stringArray.find(x => x.languageCode === languageCode);
+    let match = stringArray.find((x) => x.languageCode === languageCode);
     if (!match) {
-        match = stringArray.find(x => x.languageCode === DEFAULT_LANGUAGE_CODE);
+        match = stringArray.find((x) => x.languageCode === DEFAULT_LANGUAGE_CODE);
     }
     if (!match) {
         match = stringArray[0];

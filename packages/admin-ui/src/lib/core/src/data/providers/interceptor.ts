@@ -46,14 +46,14 @@ export class DefaultInterceptor implements HttpInterceptor {
         this.dataService.client.startRequest().subscribe();
         return next.handle(req).pipe(
             tap(
-                event => {
+                (event) => {
                     if (event instanceof HttpResponse) {
                         this.checkForAuthToken(event);
                         this.notifyOnError(event);
                         this.dataService.client.completeRequest().subscribe();
                     }
                 },
-                err => {
+                (err) => {
                     if (err instanceof HttpErrorResponse) {
                         this.notifyOnError(err);
                         this.dataService.client.completeRequest().subscribe();
@@ -96,11 +96,11 @@ export class DefaultInterceptor implements HttpInterceptor {
                         });
                     });
                 } else if (firstCode === 'CHANNEL_NOT_FOUND') {
-                    const message = graqhQLErrors.map(err => err.message).join('\n');
+                    const message = graqhQLErrors.map((err) => err.message).join('\n');
                     this.displayErrorNotification(message);
                     this.localStorageService.remove('activeChannelToken');
                 } else {
-                    const message = graqhQLErrors.map(err => err.message).join('\n');
+                    const message = graqhQLErrors.map((err) => err.message).join('\n');
                     this.displayErrorNotification(message);
                 }
             }
@@ -110,7 +110,7 @@ export class DefaultInterceptor implements HttpInterceptor {
     private extractErrorFromHttpResponse(response: HttpErrorResponse): string {
         const errors = response.error.errors;
         if (Array.isArray(errors)) {
-            return errors.map(e => e.message).join('\n');
+            return errors.map((e) => e.message).join('\n');
         } else {
             return response.message;
         }

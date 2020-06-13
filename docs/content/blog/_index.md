@@ -1,7 +1,6 @@
 ---
 title: "Vendure Blog"
+date: 2019-02-06T11:27:46+01:00
 ---
 
-# Not here!
-
-The blog posts are maintained in the `vendure-io` branch of this repo ;)
+# Vendure Blog

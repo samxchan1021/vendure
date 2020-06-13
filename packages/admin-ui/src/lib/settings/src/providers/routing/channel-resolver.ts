@@ -28,7 +28,7 @@ export class ChannelResolver extends BaseEntityResolver<Channel.Fragment> {
                 defaultShippingZone: {} as any,
                 defaultTaxZone: {} as any,
             },
-            (id) => dataService.settings.getChannel(id).mapStream((data) => data.channel),
+            id => dataService.settings.getChannel(id).mapStream(data => data.channel),
         );
     }
 }

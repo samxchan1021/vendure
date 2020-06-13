@@ -73,14 +73,14 @@ export class RoleDetailComponent extends BaseDetailComponent<Role> implements On
             channelIds: formValue.channelIds,
         };
         this.dataService.administrator.createRole(role).subscribe(
-            (data) => {
+            data => {
                 this.notificationService.success(_('common.notify-create-success'), { entity: 'Role' });
                 this.detailForm.markAsPristine();
                 this.changeDetector.markForCheck();
                 this.permissionsChanged = false;
                 this.router.navigate(['../', data.createRole.id], { relativeTo: this.route });
             },
-            (err) => {
+            err => {
                 this.notificationService.error(_('common.notify-create-error'), {
                     entity: 'Role',
                 });
@@ -105,13 +105,13 @@ export class RoleDetailComponent extends BaseDetailComponent<Role> implements On
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-update-success'), { entity: 'Role' });
                     this.detailForm.markAsPristine();
                     this.changeDetector.markForCheck();
                     this.permissionsChanged = false;
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'Role',
                     });
@@ -123,7 +123,7 @@ export class RoleDetailComponent extends BaseDetailComponent<Role> implements On
         this.detailForm.patchValue({
             description: role.description,
             code: role.code,
-            channelIds: role.channels.map((c) => c.id),
+            channelIds: role.channels.map(c => c.id),
         });
         for (const permission of Object.keys(this.permissions)) {
             this.permissions[permission] = role.permissions.includes(permission as Permission);
@@ -131,6 +131,6 @@ export class RoleDetailComponent extends BaseDetailComponent<Role> implements On
     }
 
     private getSelectedPermissions(): Permission[] {
-        return Object.keys(this.permissions).filter((p) => this.permissions[p]) as Permission[];
+        return Object.keys(this.permissions).filter(p => this.permissions[p]) as Permission[];
     }
 }

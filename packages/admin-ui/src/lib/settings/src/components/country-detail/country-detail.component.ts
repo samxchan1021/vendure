@@ -69,7 +69,7 @@ export class CountryDetailComponent extends BaseDetailComponent<Country.Fragment
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-create-success'), {
                         entity: 'Country',
                     });
@@ -77,7 +77,7 @@ export class CountryDetailComponent extends BaseDetailComponent<Country.Fragment
                     this.changeDetector.markForCheck();
                     this.router.navigate(['../', data.createCountry.id], { relativeTo: this.route });
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-create-error'), {
                         entity: 'Country',
                     });
@@ -100,14 +100,14 @@ export class CountryDetailComponent extends BaseDetailComponent<Country.Fragment
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-update-success'), {
                         entity: 'Country',
                     });
                     this.detailForm.markAsPristine();
                     this.changeDetector.markForCheck();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'Country',
                     });
@@ -116,7 +116,7 @@ export class CountryDetailComponent extends BaseDetailComponent<Country.Fragment
     }
 
     protected setFormValues(country: Country, languageCode: LanguageCode): void {
-        const currentTranslation = country.translations.find((t) => t.languageCode === languageCode);
+        const currentTranslation = country.translations.find(t => t.languageCode === languageCode);
 
         this.detailForm.patchValue({
             code: country.code,

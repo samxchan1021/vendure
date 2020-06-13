@@ -31,7 +31,7 @@ export class CustomerListComponent extends BaseListComponent<GetCustomerList.Que
         super(router, route);
         super.setQueryFn(
             (...args: any[]) => this.dataService.customer.getCustomerList(...args),
-            (data) => data.customers,
+            data => data.customers,
             (skip, take) => ({
                 options: {
                     skip,
@@ -66,7 +66,7 @@ export class CustomerListComponent extends BaseListComponent<GetCustomerList.Que
                     { type: 'danger', label: _('common.delete'), returnValue: true },
                 ],
             })
-            .pipe(switchMap((res) => (res ? this.dataService.customer.deleteCustomer(customer.id) : EMPTY)))
+            .pipe(switchMap(res => (res ? this.dataService.customer.deleteCustomer(customer.id) : EMPTY)))
             .subscribe(
                 () => {
                     this.notificationService.success(_('common.notify-delete-success'), {
@@ -74,7 +74,7 @@ export class CustomerListComponent extends BaseListComponent<GetCustomerList.Que
                     });
                     this.refresh();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-delete-error'), {
                         entity: 'Customer',
                     });

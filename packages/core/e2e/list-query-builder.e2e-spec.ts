@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import path from 'path';
 
 import { initialData } from '../../../e2e-common/e2e-initial-data';
-import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
+import { testConfig, TEST_SETUP_TIMEOUT_MS } from '../../../e2e-common/test-config';
 
 import { ListQueryPlugin } from './fixtures/test-plugins/list-query-plugin';
 import { fixPostgresTimezone } from './utils/fix-pg-timezone';

@@ -30,11 +30,11 @@ export class ProductResolver extends BaseEntityResolver<ProductWithVariants.Frag
                 variants: [],
                 channels: [],
             },
-            (id) =>
+            id =>
                 dataService.product
                     .getProduct(id)
                     .refetchOnChannelChange()
-                    .mapStream((data) => data.product),
+                    .mapStream(data => data.product),
         );
     }
 }

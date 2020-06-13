@@ -55,8 +55,8 @@ export class TaxRateDetailComponent extends BaseDetailComponent<TaxRate.Fragment
         this.init();
         this.taxCategories$ = this.dataService.settings
             .getTaxCategories()
-            .mapSingle((data) => data.taxCategories);
-        this.zones$ = this.dataService.settings.getZones().mapSingle((data) => data.zones);
+            .mapSingle(data => data.taxCategories);
+        this.zones$ = this.dataService.settings.getZones().mapSingle(data => data.zones);
     }
 
     ngOnDestroy() {
@@ -81,7 +81,7 @@ export class TaxRateDetailComponent extends BaseDetailComponent<TaxRate.Fragment
             customerGroupId: formValue.customerGroupId,
         } as CreateTaxRateInput;
         this.dataService.settings.createTaxRate(input).subscribe(
-            (data) => {
+            data => {
                 this.notificationService.success(_('common.notify-create-success'), {
                     entity: 'TaxRate',
                 });
@@ -89,7 +89,7 @@ export class TaxRateDetailComponent extends BaseDetailComponent<TaxRate.Fragment
                 this.changeDetector.markForCheck();
                 this.router.navigate(['../', data.createTaxRate.id], { relativeTo: this.route });
             },
-            (err) => {
+            err => {
                 this.notificationService.error(_('common.notify-create-error'), {
                     entity: 'TaxRate',
                 });
@@ -105,7 +105,7 @@ export class TaxRateDetailComponent extends BaseDetailComponent<TaxRate.Fragment
         this.entity$
             .pipe(
                 take(1),
-                mergeMap((taxRate) => {
+                mergeMap(taxRate => {
                     const input = {
                         id: taxRate.id,
                         name: formValue.name,
@@ -119,14 +119,14 @@ export class TaxRateDetailComponent extends BaseDetailComponent<TaxRate.Fragment
                 }),
             )
             .subscribe(
-                (data) => {
+                data => {
                     this.notificationService.success(_('common.notify-update-success'), {
                         entity: 'TaxRate',
                     });
                     this.detailForm.markAsPristine();
                     this.changeDetector.markForCheck();
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'TaxRate',
                     });

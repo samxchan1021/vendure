@@ -53,7 +53,7 @@ export class AssetDetailComponent extends BaseDetailComponent<Asset.Fragment> im
                 () => {
                     this.notificationService.success(_('common.notify-update-success'), { entity: 'Asset' });
                 },
-                (err) => {
+                err => {
                     this.notificationService.error(_('common.notify-update-error'), {
                         entity: 'Asset',
                     });

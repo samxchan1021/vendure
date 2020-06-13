@@ -47,7 +47,7 @@ export class SqlJobQueueStrategy implements JobQueueStrategy {
             .createQueryBuilder('record')
             .where('record.queueName = :queueName', { queueName })
             .andWhere(
-                new Brackets(qb => {
+                new Brackets((qb) => {
                     qb.where('record.state = :pending', {
                         pending: JobState.PENDING,
                     }).orWhere('record.state = :retrying', { retrying: JobState.RETRYING });
@@ -102,7 +102,7 @@ export class SqlJobQueueStrategy implements JobQueueStrategy {
         return this.connection
             .getRepository(JobRecord)
             .findByIds(ids)
-            .then(records => records.map(this.fromRecord));
+            .then((records) => records.map(this.fromRecord));
     }
 
     async removeSettledJobs(queueNames: string[] = [], olderThan?: Date) {

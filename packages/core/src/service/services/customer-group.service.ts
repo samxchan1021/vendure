@@ -104,7 +104,7 @@ export class CustomerGroupService {
         const customers = await this.getCustomersFromIds(input.customerIds);
         const group = await getEntityOrThrow(this.connection, CustomerGroup, input.customerGroupId);
         for (const customer of customers) {
-            if (!customer.groups.map((g) => g.id).includes(input.customerGroupId)) {
+            if (!customer.groups.map(g => g.id).includes(input.customerGroupId)) {
                 customer.groups.push(group);
                 await this.historyService.createHistoryEntryForCustomer({
                     ctx,
@@ -128,10 +128,10 @@ export class CustomerGroupService {
         const customers = await this.getCustomersFromIds(input.customerIds);
         const group = await getEntityOrThrow(this.connection, CustomerGroup, input.customerGroupId);
         for (const customer of customers) {
-            if (!customer.groups.map((g) => g.id).includes(input.customerGroupId)) {
+            if (!customer.groups.map(g => g.id).includes(input.customerGroupId)) {
                 throw new UserInputError('error.customer-does-not-belong-to-customer-group');
             }
-            customer.groups = customer.groups.filter((g) => !idsAreEqual(g.id, group.id));
+            customer.groups = customer.groups.filter(g => !idsAreEqual(g.id, group.id));
             await this.historyService.createHistoryEntryForCustomer({
                 ctx,
                 customerId: customer.id,
